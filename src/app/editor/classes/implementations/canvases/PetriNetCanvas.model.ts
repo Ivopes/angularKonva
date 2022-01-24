@@ -48,17 +48,22 @@ export class PetriNetCanvas extends CustomCanvasBase {
     this.places.push(new PlaceGraphic(this.gridCellSize * 30,this.gridCellSize * 20));
     this.places.push(new PlaceGraphic(this.gridCellSize * 30,this.gridCellSize * 30));
 
+    this.arcs.push(new ArcGraphic(this.places[0], this.places[0].x(), this.places[0].y(), this.transitions[1]));
+
     this.objectLayer.add(...this.places);
     this.objectLayer.add(...this.transitions);
+    this.objectLayer.add(...this.arcs);
+
+    this.arcs.forEach(arc => arc.moveToBottom());
     //#endregion
 
     this.transformer = new Konva.Transformer({
-      anchorSize: 7,
       rotateEnabled: false,
       shouldOverdrawWholeArea: true,
       resizeEnabled: false,
+      borderStrokeWidth: 2
     });
-    this.transformer.padding(5);
+    this.transformer.padding(0);
 
     this.objectLayer.add(this.transformer);
 

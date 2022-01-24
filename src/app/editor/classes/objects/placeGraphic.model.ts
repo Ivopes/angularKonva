@@ -11,7 +11,9 @@ export class PlaceGraphic extends Konva.Circle {
     super({
       x: x,
       y: y,
-      radius: 25,
+      //radius: 25,
+      width: 50,
+      height: 50,
       fill: 'white',
       stroke: 'black',
       strokeWidth: 5,

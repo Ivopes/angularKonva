@@ -6,7 +6,6 @@ import { ArcGraphic } from "../../objects/arcGraphic.model";
 
 export class PetriNetMouseMode extends PetriNetCanvasModeBase {
 
-
   x1!: number;
   y1!: number;
   x2!: number;
@@ -14,7 +13,7 @@ export class PetriNetMouseMode extends PetriNetCanvasModeBase {
 
   onEnter(): void {
     this.ctx.transitions.forEach(t => {
-      t.draggable(false);
+      t.draggable(true);
     });
     this.ctx.places.forEach(p => {
       p.draggable(true);
@@ -43,14 +42,14 @@ export class PetriNetMouseMode extends PetriNetCanvasModeBase {
   onMouseDown(e: KonvaEventObject<MouseEvent>): void {
     // do nothing if we mousedown on any shape
     if (e.target !== this.ctx) {
-     /* if (this.ctx.transformer.nodes().includes(e.target as any)) {
+      if (this.ctx.transformer.nodes().includes(e.target as any)) {
         return;
       }
 
       // Replace selection if clicked on another shape outside transformer
       if (this.ctx.transitions.includes(e.target as any) || this.ctx.places.includes(e.target as any) || this.ctx.arcs.includes(e.target as any)) {
         this.ctx.transformer.nodes([e.target as any]);
-      }*/
+      }
       return;
     }
     e.evt.preventDefault();
@@ -76,15 +75,36 @@ export class PetriNetMouseMode extends PetriNetCanvasModeBase {
     });
 
     // Select shapes within selection rect
-    let allShapes: Konva.Shape[] = [...this.ctx.places, ...this.ctx.transitions, ...this.ctx.arcs];
+    let allShapes: Konva.Shape[] = [...this.ctx.places, ...this.ctx.transitions];
     let box = this.ctx.selectionRectangle.getClientRect();
     let selected = allShapes.filter((shape) => {
+
       return Konva.Util.haveIntersection(box, { x: shape.x(), y: shape.y(), width: 3, height: 3})
+      //return Konva.Util.haveIntersection(box, shape.getClientRect())
     });
 
+
+    //console.log(this.ctx.objectLayer.getIntersection({x:75, y:75}));
+
+    var selectedArcs = this.ctx.arcs.filter((arc) => {
+      for ( let point of arc.registerSelectHitsPoints) {
+        let hitted = this.ctx.objectLayer.getIntersection(point);
+        if (hitted === this.ctx.selectionRectangle) {
+          return true;
+        }
+      }
+      return false;
+    });
+
+    selected.push(...selectedArcs);
     this.ctx.transformer.nodes(selected);
+
+    // Only arcs selected
     if (selected.length > 0 && selected.every((s) => s instanceof ArcGraphic)) {
-      console.log('jenom arc');
+      this.ctx.transformer.shouldOverdrawWholeArea(false);
+      //this.ctx.transformer.shoul
+    } else {
+      this.ctx.transformer.shouldOverdrawWholeArea(true);
     }
   }
   onMouseMove(e: KonvaEventObject<MouseEvent>): void {

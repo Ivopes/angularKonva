@@ -1,4 +1,5 @@
 import Konva from "konva";
+import { Vector2d } from "konva/lib/types";
 import { PlaceGraphic } from "./placeGraphic.model";
 import { TransitionGraphic } from "./transitionGraphic.model";
 
@@ -10,6 +11,8 @@ export class ArcGraphic extends Konva.Arrow {
   startFromPlace: boolean | undefined;
 
   orderInLayer = 5;
+
+  registerSelectHitsPoints: Vector2d[] = [];
 
   /**
    *
@@ -38,6 +41,7 @@ export class ArcGraphic extends Konva.Arrow {
         throw new Error('Wrong end point object type, based on start');
       }
       this.objectTo = objectTo;
+      this.updatePosition();
     }
 
 
@@ -69,7 +73,21 @@ export class ArcGraphic extends Konva.Arrow {
     let points = [0, 0, length, 0];
     this.points(points);
 
+    this.registerSelectHitsPoints = []
+
     this.rotation(angle);
+
+    // Set points for registering click & selections
+    this.registerSelectHitsPoints = [];
+    let nOfDivisions = Math.floor(length / 15);
+
+    for (let i = 0; i <= nOfDivisions; i++) {
+
+      this.registerSelectHitsPoints.push({
+        x: (deltaX * 0.6) / nOfDivisions * i + this.objectFrom.x() + (deltaX * 0.2) ,
+        y: (deltaY * 0.6) / nOfDivisions * i + this.objectFrom.y() + (deltaY * 0.2) ,
+      });
+    }
   }
   static canConnectFrom(connectTo: Konva.Shape) {
     return connectTo instanceof PlaceGraphic || connectTo instanceof TransitionGraphic;

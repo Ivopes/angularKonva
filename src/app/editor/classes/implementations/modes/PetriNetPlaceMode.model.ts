@@ -1,3 +1,4 @@
+import Konva from "konva";
 import { KonvaEventObject } from "konva/lib/Node";
 import { PetriNetCanvasModeBase } from "../../bases/PetriNetCanvasModeBase.model";
 import { PlaceGraphic } from "../../objects/placeGraphic.model";
@@ -32,7 +33,16 @@ export class PetriNetPlaceMode extends PetriNetCanvasModeBase {
       x: e.evt.offsetX,
       y: e.evt.offsetY
     });
+
+    this.snapToGrid(this.placeToDraw);
   }
   onMouseDrag(e: KonvaEventObject<MouseEvent>): void {
   }
+
+  snapToGrid(shape: Konva.Shape): void {
+    shape.position({
+      x: Math.round(shape.x() / this.ctx.gridCellSize) * this.ctx.gridCellSize,
+      y: Math.round(shape.y() / this.ctx.gridCellSize) * this.ctx.gridCellSize
+    });
+}
 }
